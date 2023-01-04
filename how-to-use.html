@@ -1,0 +1,113 @@
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    </head>
+<body>
+    <div class="container p-4">
+        <div class="row">
+            <div class="col-3">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="how-to-run.html">How to Run</a></li>
+                    <li><strong>How to Use</strong></li>
+                </ul>
+            </div>
+            <div class="col">
+              <h5>
+                Generate Health ID
+                </h5>
+                <p class="mt-4">Login as shr-system-admin to identity server to get a access-token</p>
+                <code>
+                  curl http://localhost:8084/signin -H "X-Auth-Token:local-shr-system-admin_auth_token" -H "client_id:18700" --form "email=local-shr-system-admin@test.com" --form "password=password"
+                </code>
+                
+                <p class="mt-4">Use the access token to generate Health-IDs for MCI. Replace the <code>ACCESS-TOKEN-FROM-ABOVE-STEP</code> in below request with token from above step.</p>
+                <code>
+                  curl -X POST 'http://localhost:8086/healthIds/generateBlock?start=9800000100&totalHIDs=100' -H 'From: local-shr-system-admin@test.com' -H 'X-Auth-Token: ACCESS-TOKEN-FROM-ABOVE-STEP' -H 'client_id: 18700'
+                </code>
+                <h5 class="pt-5">
+                  Insert MCI Locations
+                </h5>
+                <p class="mt-4">We need to have locations setup to create patients in MCI. A sample locations cql file is available <code>cassandra/mci_locations.cql</code> of HIE-Docker or Infrastructure repository.</p>
+                
+                  <code>
+                    <pre>
+          docker cp cassandra/mci_locations.cql cassandra-seed:/tmp
+          docker exec cassandra-seed /bin/bash -c "cqlsh -k mci -f /tmp/mci_locations.cql"
+                  </pre>
+                </code>
+                <h5 class="pt-3">
+                  Insert Patient
+                </h5>
+                <p class="mt-4">Login to IDP as <code>facility-admin</code> to get a token.</p>
+                
+                  <code>
+                    curl http://localhost:8084/signin -H "X-Auth-Token:local-facility-admin_auth_token" -H "client_id:18701" --form "email=local-facility-admin@test.com" --form "password=password"
+                </code>
+                <p class="mt-2">
+                  Use the access token to create patient in MCI. Replace the <code>ACCESS-TOKEN-FROM-ABOVE-STEP</code> in below request with token from above step.
+                </p>
+                <code>
+                  <pre>
+          curl -X POST \
+              http://localhost:8081/api/v1/patients \
+              -H 'Content-Type: application/json' \
+              -H 'From: local-facility-admin@test.com' \
+              -H 'X-Auth-Token: ACCESS-TOKEN-FROM-ABOVE-STEP' \
+              -H 'client_id: 18701' \
+              -d '{
+                "given_name": "Pavan",
+                "sur_name": "Das",
+                "nid": "1666321725072",
+                "date_of_birth": "1992-07-14",
+                "gender": "M",
+                "present_address": {
+                    "address_line": "Street 1, Baridhara village",
+                    "division_id": "30",
+                    "district_id": "26",
+                    "upazila_id": "02"
+                },
+                "confidential": "No"
+            }'
+                  </pre>
+                </code>
+                <p>If the Patient is created successfully, the server assign a health ID to that patient.</p>
+                <p>We can find deails patient here: <a href="https://sharedhealth.atlassian.net/wiki/spaces/docs/pages/48201741/MCI+Patient+Create+Validations" target="_target">https://sharedhealth.atlassian.net/wiki/spaces/docs/pages/48201741/MCI+Patient+Create+Validations</a></p>
+                <h5 class="pt-3">
+                  Insert Encounter
+                </h5>
+                <p class="mt-4">
+                  We can use the same <code>facility-admin</code> token for creating Encounter.
+                  We have to use the following API for creating an Encounter. We have to replace the <code>HEALTH_ID</code> in the following API by the patient health ID.
+                </p>
+                <code>
+                  POST http://localhost:8082/v2/patients/HEALTH_ID/encounters
+                </code>
+                <h5 class="mt-5">Encounter Payload</h5>
+                <p>The above API accept the following payload structure.</p>
+                <code>
+                  <pre>
+          &lt;encounter&gt;
+            &lt;content&gt;
+            &lt;![CDATA[
+            ]]&gt;
+            &lt;/content&gt;
+          &lt;/encounter&gt;
+          </pre>
+                </code>
+                <p>The FHIR bundle will have to be putted inside the <code>&lt;![CDATA[ ]]&gt;</code> code. We can find the details of FHIR bundle in the following link:
+                <a href="https://sharedhealth.atlassian.net/wiki/spaces/docs/pages/524346/Shared+Health+Record" target="_blank">https://sharedhealth.atlassian.net/wiki/spaces/docs/pages/524346/Shared+Health+Record</a>
+              </p>
+              <h5 class="mt-5">
+                Postman Collection
+              </h5>
+              <p>
+                There is a useful Postman collection is available in the following link:
+                [<a href="postman_collection.json" target="_blank">Link</a>]
+              </p>
+            </div>
+        </div>
+    </div>  
+</body>
+</html>
+

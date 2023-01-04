@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    </head>
+<body>
+    <div class="container p-4">
+        <div class="row">
+            <div class="col-3">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><strong>How to Run</strong></li>
+                    <li><a href="how-to-use.html">How to Use</a></li>
+                </ul>
+            </div>
+            <div class="col">
+
+      <h3>
+        Run Pre-built Docker Images
+      </h3>
+      <p>
+        If we want to run the application we can use the pre-built docker images by following few steps.
+      </p>
+      <p>
+        We have to download the following repository from Github: Infrastructure [<a href="https://github.com/SharedHealthRecord/Infrastructure" target="_blank">Link</a>].
+      </p>
+      <p>
+        Then we have to execute the following commands.
+      </p>
+      <code>
+      <pre>
+      $ cd Infrastructure
+      $ sudo ./run-shr-cluster.sh
+      </pre>
+      </code>
+      <h3>
+      Build Docker Images
+      </h3>
+      <p>
+      If it requires to change in source code then we have to build the docker images again.
+      </p>
+      <h5>
+      Pre-requisites
+      </h5>
+      <ul>
+      <li>JDK 1.8</li>
+      </ul>
+      <h5>
+      Github Repositories
+      </h5>
+      <p>
+      We have to clone/download the following Github repositories:
+      </p>
+      <ul>
+      <li>Identity Service [<a href="https://github.com/SharedHealthRecord/Identity-Server" target="_blank">Link</a>]</li>
+      <li>HealthID Service [<a href="https://github.com/SharedHealthRecord/HealthId-Server" target="_blank">Link</a>]</li>
+      <li>MCI Service [<a href="https://github.com/SharedHealthRecord/MCI-Service" target="_blank">Link</a>]</li>
+      <li>Terminology Service [<a href="https://github.com/SharedHealthRecord/Terminology-Server" target="_blank">Link</a> ]</li>
+      <li>FreeSHR Service [<a href="https://github.com/SharedHealthRecord/FreeSHR" target="_blank">Link</a>]</li>
+      <li>HIE Docker [<a href="https://github.com/SharedHealthRecord/HIE-Docker" target="_blank">Link</a>]</li>
+      </ul>
+      <p>
+      Building the docker images and running the docker containers need the following steps to follow:
+      </p>
+      <code>
+      <pre>
+      $ cd HIE-Docker
+      $ ./build-all-services.sh
+      $ sudo ./create-shr-cluster.sh
+      </pre>
+      </code>
+      <p>
+      <code>build-all-services.sh</code> command build the services. <code>create-shr-cluster.sh</code> command build docker images using <code>Dockerfile</code>.
+      </p>
+      <p>
+      On some machines, <code>create-shr-cluser.sh</code> script may fail to execute because of missing <code>docker-compose</code> command. In that case we have to replace <code>docker-compose</code> by <code>docker compose</code>.
+      </p>
+      <div class="card">
+        <div class="card-body">
+          We can also run the individual services as <code>gradle</code> projects. It will require running <code>MySQL 3.6</code> and <code>Cassandra</code> locally.
+        </div>
+      </div>
+            </div>
+        </div>
+    </div>  
+</body>
+</html>
